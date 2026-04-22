@@ -1,0 +1,14 @@
+{
+  "name": "team-collaboration-microservices",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"npm start --prefix services/users\" \"npm start --prefix services/products\"",
+    "dev": "concurrently \"npm run dev --prefix services/users\" \"npm run dev --prefix services/products\"",
+    "install:all": "npm install && npm install --prefix services/users && npm install --prefix services/products",
+    "test": "npm test --prefix services/users && npm test --prefix services/products"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
