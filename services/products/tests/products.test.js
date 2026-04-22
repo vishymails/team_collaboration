@@ -70,6 +70,43 @@ describe('POST /products', () => {
   });
 });
 
+describe('PUT /products/:id', () => {
+  it('updates all fields of an existing product', async () => {
+    const res = await request(app)
+      .put('/products/1')
+      .send({ name: 'Gaming Laptop', price: 1499.99, stock: 5 });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toMatchObject({ name: 'Gaming Laptop', price: 1499.99, stock: 5 });
+  });
+
+  it('updates only price when other fields are omitted', async () => {
+    const res = await request(app).put('/products/2').send({ price: 19.99 });
+    expect(res.status).toBe(200);
+    expect(res.body.data.price).toBe(19.99);
+    expect(res.body.data.name).toBe('Mouse');
+  });
+
+  it('updates only stock', async () => {
+    const res = await request(app).put('/products/1').send({ stock: 100 });
+    expect(res.status).toBe(200);
+    expect(res.body.data.stock).toBe(100);
+    expect(res.body.data.name).toBe('Laptop');
+  });
+
+  it('returns 400 when no fields are provided', async () => {
+    const res = await request(app).put('/products/1').send({});
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  it('returns 404 for unknown id', async () => {
+    const res = await request(app).put('/products/999').send({ name: 'Ghost' });
+    expect(res.status).toBe(404);
+    expect(res.body.success).toBe(false);
+  });
+});
+
 describe('DELETE /products/:id', () => {
   it('deletes an existing product', async () => {
     const res = await request(app).delete('/products/1');

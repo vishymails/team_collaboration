@@ -47,24 +47,26 @@ npm test --prefix services/products
 
 ```
 services/
-  users/           Express app on port 3001
-    app.js         Express app (no listen — importable by tests)
-    index.js       Server bootstrap (calls app.listen)
-    routes/
-      users.js     CRUD route handlers (in-memory store lives here)
+  users/               Express app on port 3001
+    src/api/
+      users.js         Full CRUD route handlers (in-memory store lives here)
+    app.js             Express app (no listen — importable by tests)
+    index.js           Server bootstrap (calls app.listen)
     tests/
       users.test.js
-  products/        Express app on port 3002
-    app.js         Express app (no listen — importable by tests)
-    index.js       Server bootstrap
-    routes/
-      products.js  CRUD route handlers (in-memory store lives here)
+  products/            Express app on port 3002
+    src/api/
+      products.js      Full CRUD route handlers (in-memory store lives here)
+    app.js             Express app (no listen — importable by tests)
+    index.js           Server bootstrap
     tests/
       products.test.js
-package.json       Root — runs both via `concurrently`, runs all tests
+package.json           Root — runs both via `concurrently`, runs all tests
 ```
 
 Each service is a fully self-contained Express application with its own `package.json` and `node_modules`. The root `package.json` uses `concurrently` solely to start both processes together; there is no shared runtime code between services.
+
+Route handlers live in `src/api/<service>.js`. `app.js` wires the router to the Express instance without starting the server, making it directly importable by tests via `jest.resetModules()`.
 
 ## API Endpoints
 
@@ -75,6 +77,7 @@ Each service is a fully self-contained Express application with its own `package
 | GET | `/users` | List all users |
 | GET | `/users/:id` | Get user by ID |
 | POST | `/users` | Create user (`{ name, email }`) |
+| PUT | `/users/:id` | Update user (`{ name?, email? }`) |
 | DELETE | `/users/:id` | Delete user |
 
 **Products service** — `http://localhost:3002`
@@ -84,11 +87,12 @@ Each service is a fully self-contained Express application with its own `package
 | GET | `/products` | List all products |
 | GET | `/products/:id` | Get product by ID |
 | POST | `/products` | Create product (`{ name, price, stock? }`) |
+| PUT | `/products/:id` | Update product (`{ name?, price?, stock? }`) |
 | DELETE | `/products/:id` | Delete product |
 
 ## Data Storage
 
-Both services use in-memory arrays (no database). Data resets on every restart. To add persistence, replace the in-memory arrays in each `routes/*.js` file with a database client.
+Both services use in-memory arrays (no database). Data resets on every restart. To add persistence, replace the in-memory arrays in each `src/api/*.js` file with a database client.
 
 ## Port Configuration
 
